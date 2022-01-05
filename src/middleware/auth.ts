@@ -1,7 +1,6 @@
 import { MiddlewareContext } from "../utils/types/model";
 import { MiddlewareFn } from "type-graphql";
 import { verify } from "jsonwebtoken";
-import { _dbContext } from "../utils/context";
 import { AuthenticationError } from "apollo-server-express";
 
 type PayloadToken = {
@@ -21,7 +20,7 @@ export const isAuthenticated: MiddlewareFn<MiddlewareContext> = async ({context}
         const payload = verify(authToken, process.env.SECRET_KEY!) as PayloadToken;
         const userId = payload.userId;
 
-        const user = await _dbContext.prisma.user.findUnique({
+        const user = await context.prisma.user.findUnique({
             where: {
                 id: userId
             }

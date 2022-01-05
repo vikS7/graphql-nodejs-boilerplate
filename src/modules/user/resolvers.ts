@@ -2,7 +2,6 @@ import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql
 import { AuthResponse, User } from "./model";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { _dbContext } from "../../utils/context";
 import { generateAuthToken } from "../../utils/helper";
 import { isAuthenticated } from "../../middleware/auth";
 import { MiddlewareContext } from "../../utils/types/model";
@@ -14,11 +13,12 @@ export class UserResolvers{
     async register(
         @Arg("email") email: string,
         @Arg("password") password: string,
-        @Arg("name") name: string
+        @Arg("name") name: string,
+        @Ctx() context: MiddlewareContext
     ): Promise<AuthResponse>{
         const hashedPassword = await bcrypt.hash(password, 12);
         try{
-            const user = await _dbContext.prisma.user.create({
+            const user = await context.prisma.user.create({
                 data: {
                     email : email,
                     name: name,
@@ -40,9 +40,10 @@ export class UserResolvers{
     @Mutation(() => AuthResponse)
     async login(
         @Arg("email") email: string,
-        @Arg("password") password: string
+        @Arg("password") password: string,
+        @Ctx() context: MiddlewareContext
     ){
-        const user = await _dbContext.prisma.user.findUnique({
+        const user = await context.prisma.user.findUnique({
             where: {
                 email : email
             }
@@ -68,9 +69,10 @@ export class UserResolvers{
     @Query(() => User)
     @UseMiddleware(isAuthenticated)
     async getUserById(
-        @Arg("userId") userId: string
+        @Arg("userId") userId: string,
+        @Ctx() context: MiddlewareContext
     ){
-        const user = await _dbContext.prisma.user.findUnique({
+        const user = await context.prisma.user.findUnique({
             where: {
                 id: userId
             }

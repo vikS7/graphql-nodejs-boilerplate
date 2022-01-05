@@ -5,6 +5,8 @@ import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { UserResolvers } from './modules/user/resolvers';
 import cors from 'cors';
+import { createContext } from './utils/context';
+
 
 (async () => {
     const app = express();
@@ -13,7 +15,7 @@ import cors from 'cors';
         schema: await buildSchema({
             resolvers: [UserResolvers]
         }),
-        context : ({req, res}) => ({req, res})
+        context : createContext
     });
     
     app.use(cors());

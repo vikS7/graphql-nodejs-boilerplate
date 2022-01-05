@@ -1,8 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaContext } from "./types/model";
+import { Request, Response } from "express";
 
-const primsa = new PrismaClient();
+const prisma = new PrismaClient();
 
-export const _dbContext: PrismaContext = {
-    prisma : primsa
+export function createContext(req: Request, res: Response)  {
+    return {
+        ...req,
+        ...res,
+        prisma
+    }
 } 
